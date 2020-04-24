@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import genanki
 import unittest
 import main
+import os
 
 
 # Scott uses the requests module to fetch the html.
@@ -38,8 +39,8 @@ class TestFetchAndParseHtml(unittest.TestCase):
     def test_get_method_body(self):
         """ Parse out the body of the first method and return it. """
         method_body = main.get_method_body(self.single_method)
-        self.assertTrue(method_body.startswith('\nint.bit_length'))
-        self.assertTrue(method_body.endswith('New in version 3.1.\n'))
+        self.assertTrue(method_body.startswith('<dl class="method">\n <dt id="int.bit_length">\n'))
+        self.assertTrue(method_body.endswith('New in version 3.1.\n    </span>\n   </p>\n  </div>\n </dd>\n</dl>\n'))
 
     def test_get_methods(self):
         """ Get the list of methods for a given page. """
@@ -58,9 +59,12 @@ class TestFetchAndParseHtml(unittest.TestCase):
         deck = main.make_anki_deck(methods, title)
         self.assertIs(type(deck), genanki.deck.Deck)
 
-
-
-
+    def test_go(self):
+        """ Test that it all works and writes out the file. """
+        # deck_filename = 'Test_deck_string_methods'
+        deck_filename = 'Test deck (string methods)'
+        main.go(deck_filename, self.url)
+        self.assertTrue(os.path.exists(deck_filename + '.apkg'))
 
 
 # Run all classes that inherit from unittest.TestCase

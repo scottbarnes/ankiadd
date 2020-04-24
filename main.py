@@ -36,7 +36,7 @@ def get_method_body(soup: BeautifulSoup) -> str:
     # result = soup.get_text()
     # result = result.replace('Â¶', '')  # Clean the anchor link icons.
     # result = result.replace('\n\n', '\n')  # And excess new lines.
-    result = soup.prettify()
+    result = soup.prettify()  # This casts the BeautifulSoup tag as str.
     result = result.replace('Â¶', '')  # Clean up the anchor icons.
     return result
 
@@ -78,6 +78,15 @@ def make_anki_deck(methods: Iterable[BeautifulSoup], title: str) -> genanki.deck
     return deck
 
 
+def go(deck_filename: str, url: str):
+    """ Pull it all together and write the deck to a file. """
+    html = get_html(url)
+    soup = get_soup(html)
+    methods = get_methods(soup)
+    deck = make_anki_deck(methods, deck_filename)
+    genanki.Package(deck).write_to_file(deck_filename + '.apkg')
+
+
 # He then sees it can make a flash card from the soup.
 genanki_model = genanki.Model(
     1476131965,
@@ -92,13 +101,7 @@ genanki_model = genanki.Model(
             'qfmt': '{{Question}}',
             'afmt': '{{FrontSide}}<hr id="answer">{{Answer}}',
         },
-    ]
+    ],
 )
 
-
-html = get_html('https://docs.python.org/3/library/stdtypes.html#string-methods')
-soup = get_soup(html)
-methods = get_methods(soup)
-deck = make_anki_deck(methods, 'String methods')
-genanki.Package(deck).write_to_file('output.apkg')
 
